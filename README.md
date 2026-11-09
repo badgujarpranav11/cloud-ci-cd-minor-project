@@ -28,3 +28,4 @@ to Docker Hub.
 
 The project is complete only after the workflow succeeds
 and the image is visible in Docker Hub.
+CI/CD workflow verification.
