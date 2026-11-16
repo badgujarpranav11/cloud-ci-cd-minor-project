@@ -45,11 +45,17 @@ pipeline {
                 bat 'python -m py_compile app.py'
             }
         }
+
+        stage('Docker Build Image') {
+            steps {
+                bat 'docker build -t cloud-ci-cd-demo:latest -t cloud-ci-cd-demo:%BUILD_NUMBER% .'
+            }
+        }
     }
 
     post {
         success {
-            echo 'Initial CI pipeline completed successfully!'
+            echo 'CI pipeline completed successfully!'
         }
 
         failure {
