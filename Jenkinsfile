@@ -51,11 +51,30 @@ pipeline {
                 bat 'docker build -t cloud-ci-cd-demo:latest -t cloud-ci-cd-demo:%BUILD_NUMBER% .'
             }
         }
+
+        stage('Push Image to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_TOKEN'
+                )]) {
+                    bat '''
+                    @echo off
+                    echo %DOCKERHUB_TOKEN%| docker login --username %DOCKERHUB_USER% --password-stdin
+                    docker tag cloud-ci-cd-demo:latest badgujarpranav11/cloud-ci-cd-demo:latest
+                    docker tag cloud-ci-cd-demo:%BUILD_NUMBER% badgujarpranav11/cloud-ci-cd-demo:%BUILD_NUMBER%
+                    docker push badgujarpranav11/cloud-ci-cd-demo:latest
+                    docker push badgujarpranav11/cloud-ci-cd-demo:%BUILD_NUMBER%
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'CI pipeline completed successfully!'
+            echo 'CI/CD pipeline completed successfully!'
         }
 
         failure {
