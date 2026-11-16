@@ -8,6 +8,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Source code checkout successful'
@@ -43,6 +44,18 @@ pipeline {
         stage('Verify Python Backend') {
             steps {
                 bat 'python -m py_compile app.py'
+            }
+        }
+
+        stage('SonarQube Code Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
+                    }
+                }
             }
         }
 
