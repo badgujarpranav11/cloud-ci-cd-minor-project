@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -22,6 +21,7 @@ pipeline {
                 bat 'npm --version'
                 bat 'python --version'
                 bat 'docker --version'
+                bat '"C:\\Tools\\trivy_0.76.2_windows-64bit\\trivy.exe.exe" --version'
             }
         }
 
@@ -69,7 +69,13 @@ pipeline {
 
         stage('Docker Build Image') {
             steps {
-                bat 'docker build -t cloud-ci-cd-demo:latest -t cloud-ci-cd-demo:%BUILD_NUMBER% .'
+                bat 'docker build --pull --no-cache -t cloud-ci-cd-demo:latest -t cloud-ci-cd-demo:%BUILD_NUMBER% .'
+            }
+        }
+
+        stage('Trivy Vulnerability Scan') {
+            steps {
+                bat '"C:\\Tools\\trivy_0.76.2_windows-64bit\\trivy.exe.exe" image --scanners vuln --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed cloud-ci-cd-demo:%BUILD_NUMBER%'
             }
         }
 
